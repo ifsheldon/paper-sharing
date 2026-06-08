@@ -114,9 +114,9 @@ button {
 
 .slide-tab {
   display: grid;
-  grid-template-columns: 34px 20px minmax(0, 1fr);
+  grid-template-columns: 24px 18px minmax(0, 1fr);
   align-items: center;
-  gap: 9px;
+  gap: 6px;
   width: 100%;
   padding: 10px 9px;
   border: 1px solid transparent;
@@ -137,6 +137,10 @@ button {
   color: var(--green);
   font-family: var(--font-geist-mono), monospace;
   font-size: 11px;
+}
+
+.slide-tab > svg {
+  justify-self: center;
 }
 
 .slide-tab-copy {
