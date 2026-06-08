@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Paper Sharing Template",
-  description: "A web-based research group paper sharing slide template.",
+  title: "Orality Paper Sharing",
+  description:
+    "A research group paper sharing deck for Orality and related CHI 2026 papers.",
 };
 
 export default function RootLayout({

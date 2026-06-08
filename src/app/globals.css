@@ -104,6 +104,12 @@ button {
   min-height: 0;
   overflow: auto;
   padding-right: 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.slide-list::-webkit-scrollbar {
+  display: none;
 }
 
 .slide-tab {
@@ -150,7 +156,7 @@ button {
 
 .deck-stage {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 10px;
   overflow: hidden;
   min-width: 0;
@@ -170,8 +176,9 @@ button {
 }
 
 .deck-toolbar {
-  justify-content: flex-end;
-  gap: 18px;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
 }
 
 .deck-controls {
@@ -182,6 +189,10 @@ button {
 .toolbar-actions,
 .control-cluster {
   gap: 8px;
+}
+
+.toolbar-actions {
+  flex: 0 0 auto;
 }
 
 .icon-button,
@@ -226,12 +237,13 @@ button {
   display: flex;
   gap: 4px;
   overflow-x: auto;
+  min-width: 0;
   padding-bottom: 2px;
 }
 
 .section-rail span {
   flex: 0 0 auto;
-  padding: 7px 10px;
+  padding: 7px 9px;
   border: 1px solid rgba(24, 32, 29, 0.14);
   color: var(--muted);
   background: rgba(255, 253, 250, 0.62);
@@ -331,6 +343,51 @@ button {
   color: var(--muted);
   font-size: clamp(13px, 1.35vw, 18px);
   line-height: 1.35;
+}
+
+.slide-paper-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.paper-meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 8px;
+  background: rgba(255, 253, 250, 0.82);
+  color: var(--ink);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.paper-meta-badge > span {
+  color: var(--accent);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.paper-meta-badge > strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 760;
+  line-height: 1;
+}
+
+.paper-meta-link {
+  background: color-mix(in srgb, var(--accent) 9%, var(--paper));
+}
+
+.paper-meta-link:hover {
+  border-color: color-mix(in srgb, var(--accent) 54%, var(--line));
+  background: color-mix(in srgb, var(--accent) 14%, var(--paper));
 }
 
 .slide-grid {
@@ -859,6 +916,717 @@ button {
   line-height: 1.15;
 }
 
+.orality-layout {
+  display: grid;
+  gap: clamp(14px, 1.5vw, 24px);
+  min-height: 0;
+  height: 100%;
+}
+
+.orality-cover,
+.orality-comparison,
+.orality-figure-focus,
+.orality-pipeline-slide {
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: stretch;
+}
+
+.slide-canvas.layout-cover .slide-title-row h2 {
+  font-size: clamp(24px, 1.8vw, 32px);
+  font-weight: 760;
+  line-height: 1.08;
+  white-space: nowrap;
+}
+
+.orality-cover {
+  grid-template-columns: minmax(560px, 1.06fr) minmax(360px, 0.94fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.orality-cover-headline {
+  display: grid;
+  grid-column: 1 / -1;
+  align-content: start;
+  gap: 8px;
+}
+
+.orality-cover-headline h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(22px, 1.55vw, 28px);
+  font-weight: 400;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.orality-cover-headline p {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: clamp(12px, 0.95vw, 15px);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.orality-figure-focus {
+  grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.82fr);
+}
+
+.orality-figure-focus.figure-right {
+  grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+}
+
+.orality-big-idea,
+.orality-cards-slide,
+.orality-quadrant-slide,
+.orality-takeaways,
+.orality-related-slide {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.orality-funnel-slide {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.orality-evidence-slide {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: clamp(10px, 1.05vw, 16px);
+}
+
+.orality-bullet-slide {
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+  gap: clamp(12px, 1.25vw, 18px);
+}
+
+.orality-cards-slide[data-slide-id="author-contributions"] {
+  grid-template-rows: auto auto;
+  align-content: start;
+}
+
+.orality-cards-slide[data-slide-id="formative-design-goals"] {
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: start;
+}
+
+.orality-copy-panel,
+.orality-thesis,
+.orality-quote-panel {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.orality-figure-focus.figure-right .orality-copy-panel {
+  align-content: center;
+}
+
+.orality-figure-focus[data-slide-id="conceptual-framework"]
+  .orality-copy-panel {
+  gap: clamp(12px, 1.3vw, 18px);
+}
+
+.orality-figure-focus[data-slide-id="conceptual-framework"]
+  .orality-copy-panel
+  > p {
+  color: var(--ink);
+  font-size: clamp(18px, 1.45vw, 24px);
+  line-height: 1.2;
+}
+
+.orality-quote-panel {
+  align-content: center;
+  padding: clamp(18px, 2.5vw, 30px);
+  border-left: 7px solid var(--accent);
+  background: var(--paper-soft);
+}
+
+.orality-copy-panel h3,
+.orality-thesis h3,
+.orality-quote-panel h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(24px, 3.1vw, 42px);
+  line-height: 1.02;
+}
+
+.orality-copy-panel p,
+.orality-thesis p,
+.orality-quote-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(13px, 1.25vw, 17px);
+  line-height: 1.45;
+}
+
+.orality-figure-focus[data-slide-id="related-orca"] .orality-copy-panel h3 {
+  font-size: clamp(20px, 1.95vw, 28px);
+  line-height: 1.16;
+}
+
+.orality-motivation-bullets {
+  display: grid;
+  align-content: start;
+  gap: clamp(12px, 1.35vw, 18px);
+  max-width: 1500px;
+  min-height: auto;
+  margin: 0;
+  padding: 2px 0 0 28px;
+  list-style: disc;
+}
+
+.orality-motivation-bullets li {
+  padding-left: 6px;
+  color: var(--ink);
+  font-size: clamp(18px, 1.8vw, 28px);
+  line-height: 1.28;
+}
+
+.orality-motivation-bullets li::marker {
+  color: var(--accent);
+}
+
+.orality-bullet-slide :where(.orality-figure-panel) {
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-self: stretch;
+  justify-self: center;
+  width: min(100%, 1320px);
+  gap: 6px;
+  padding: 8px;
+}
+
+.orality-bullet-slide :where(.paper-figure-shell) {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.orality-bullet-slide :where(.paper-figure-shell img) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.orality-meta-grid,
+.orality-point-grid {
+  display: grid;
+  gap: 12px;
+  min-height: 0;
+}
+
+.orality-meta-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-self: start;
+}
+
+.orality-cover .orality-meta-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-self: center;
+}
+
+.orality-point-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.orality-point-grid[data-compact="true"] {
+  grid-template-columns: 1fr;
+}
+
+.orality-cards-slide[data-slide-id="author-contributions"] .orality-point-grid {
+  align-content: start;
+}
+
+.orality-cards-slide[data-slide-id="formative-design-goals"]
+  .orality-point-grid {
+  align-content: start;
+}
+
+.orality-point-card {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+  padding: clamp(12px, 1.4vw, 18px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 250, 0.82);
+}
+
+.orality-point-card[data-compact="true"] {
+  padding: 12px 14px;
+}
+
+.orality-cards-slide[data-slide-id="author-contributions"] .orality-point-card {
+  min-height: clamp(142px, 12vw, 184px);
+}
+
+.orality-cards-slide[data-slide-id="formative-design-goals"]
+  .orality-point-card {
+  min-height: clamp(138px, 11.5vw, 176px);
+}
+
+.orality-point-card[data-emphasis="true"] {
+  border-color: color-mix(in srgb, var(--green) 42%, var(--line));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--green) 16%, var(--paper)),
+    rgba(255, 253, 250, 0.9) 62%
+  );
+  box-shadow: inset 6px 0 0 var(--green);
+}
+
+.orality-point-card[data-emphasis="true"] span {
+  color: var(--green);
+}
+
+.orality-figure-focus[data-slide-id="conceptual-framework"]
+  .orality-point-card {
+  padding: clamp(10px, 1.05vw, 14px);
+}
+
+.orality-point-card div {
+  display: grid;
+  gap: 5px;
+}
+
+.orality-point-card span,
+.orality-funnel-step span,
+.related-paper-card span {
+  color: var(--accent);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.orality-point-card strong,
+.orality-funnel-step strong,
+.related-paper-card strong {
+  color: var(--ink);
+  font-size: clamp(16px, 1.45vw, 22px);
+  line-height: 1.12;
+}
+
+.orality-point-card p,
+.orality-point-card a,
+.orality-point-card li,
+.orality-funnel-step p,
+.related-paper-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(12px, 1.1vw, 15px);
+  line-height: 1.4;
+}
+
+.orality-point-card ul {
+  display: grid;
+  gap: 5px;
+  list-style: disc;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.orality-point-card a {
+  color: var(--green);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.orality-evidence-summary {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.35fr);
+  gap: clamp(14px, 1.6vw, 24px);
+  align-items: center;
+  min-width: 0;
+}
+
+.orality-evidence-summary h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(22px, 2.35vw, 34px);
+  line-height: 1.05;
+}
+
+.orality-evidence-summary .orality-point-grid,
+.orality-evidence-summary .orality-point-grid[data-compact="true"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.orality-evidence-summary :where(.orality-point-card) {
+  min-height: 0;
+  padding: clamp(9px, 1vw, 13px);
+}
+
+.orality-evidence-summary :where(.orality-point-card strong) {
+  font-size: clamp(14px, 1.15vw, 18px);
+}
+
+.orality-evidence-summary :where(.orality-point-card p) {
+  font-size: clamp(11px, 0.95vw, 13px);
+  line-height: 1.32;
+}
+
+.orality-figure-panel {
+  display: grid;
+  grid-template-rows: auto auto;
+  align-self: center;
+  gap: 10px;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--accent) 9%, transparent),
+      transparent 46%
+    ), rgba(255, 253, 250, 0.9);
+}
+
+.paper-figure-shell,
+.related-figure-shell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: var(--figure-aspect);
+  min-height: 0;
+  border: 1px solid rgba(24, 32, 29, 0.12);
+  background: white;
+}
+
+.paper-figure-shell img,
+.related-figure-shell img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.related-figure-shell img {
+  object-fit: contain;
+}
+
+.orality-figure-panel figcaption {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.orality-figure-panel:has(.figure-read-card) .paper-figure-shell {
+  justify-self: center;
+  width: 100%;
+}
+
+.orality-figure-panel:has(.figure-read-card) .paper-figure-shell img {
+  position: absolute;
+  inset: 0;
+}
+
+.orality-figure-panel:has(.figure-read-card + .figure-read-card) {
+  align-self: stretch;
+  gap: 6px;
+  padding: 8px;
+}
+
+@media (max-width: 1499px), (max-height: 819px) {
+  .orality-figure-focus[data-slide-id^="related-"] {
+    gap: 12px;
+  }
+
+  .orality-figure-focus[data-slide-id^="related-"] .orality-copy-panel {
+    gap: 8px;
+    align-content: center;
+    overflow: hidden;
+  }
+
+  .orality-figure-focus[data-slide-id^="related-"] .orality-copy-panel h3 {
+    font-size: clamp(16px, 1.75vw, 22px);
+    line-height: 1.12;
+  }
+
+  .orality-figure-focus[data-slide-id^="related-"]
+    .orality-point-grid[data-compact="true"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .orality-figure-focus[data-slide-id^="related-"]
+    .orality-point-card[data-compact="true"] {
+    gap: 5px;
+    padding: 8px;
+  }
+
+  .orality-figure-focus[data-slide-id^="related-"] .orality-point-card span {
+    font-size: 8.5px;
+  }
+
+  .orality-figure-focus[data-slide-id^="related-"] .orality-point-card strong {
+    font-size: 12.5px;
+    line-height: 1.15;
+  }
+
+  .orality-figure-focus[data-slide-id^="related-"] .orality-point-card p {
+    display: none;
+  }
+
+  .orality-figure-panel:has(.figure-read-card + .figure-read-card)
+    .paper-figure-shell {
+    width: min(100%, 420px);
+  }
+}
+
+.figure-read-card {
+  display: grid;
+  gap: 6px;
+  padding: clamp(10px, 1.05vw, 14px);
+  border: 1px solid color-mix(in srgb, var(--green) 42%, var(--line));
+  border-radius: 8px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--green) 16%, var(--paper)),
+    rgba(255, 253, 250, 0.92) 62%
+  );
+  box-shadow: inset 5px 0 0 var(--green);
+}
+
+.figure-read-card span {
+  color: var(--green);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.figure-read-card strong {
+  color: var(--ink);
+  font-size: clamp(14px, 1.15vw, 18px);
+  line-height: 1.18;
+}
+
+.orality-figure-panel:has(.figure-read-card + .figure-read-card)
+  .figure-read-card {
+  gap: 3px;
+  padding: clamp(5px, 0.65vw, 8px);
+}
+
+.orality-figure-panel:has(.figure-read-card + .figure-read-card)
+  .figure-read-card
+  span {
+  font-size: 8px;
+}
+
+.orality-figure-panel:has(.figure-read-card + .figure-read-card)
+  .figure-read-card
+  strong {
+  font-size: clamp(12px, 0.95vw, 14px);
+  line-height: 1.12;
+}
+
+.orality-cover .paper-figure-shell {
+  aspect-ratio: var(--figure-aspect);
+}
+
+.orality-evidence-slide :where(.orality-figure-panel) {
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-self: stretch;
+  width: 100%;
+  max-width: none;
+  gap: 6px;
+  padding: 8px;
+}
+
+.orality-evidence-slide :where(.paper-figure-shell) {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.orality-evidence-slide :where(.paper-figure-shell img) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.orality-funnel {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 0;
+}
+
+.orality-funnel-step {
+  display: grid;
+  gap: 5px;
+  padding: 13px 16px;
+  border-left: 5px solid var(--accent);
+  background: var(--paper-soft);
+}
+
+.orality-quadrant {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-height: 0;
+}
+
+.orality-quadrant-cell {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  min-height: 0;
+  padding: clamp(14px, 1.7vw, 22px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 250, 0.82);
+}
+
+.orality-quadrant-cell[data-selected="true"] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 13%, var(--paper));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.orality-quadrant-cell strong {
+  color: var(--ink);
+  font-size: clamp(18px, 1.8vw, 28px);
+  line-height: 1.08;
+}
+
+.orality-quadrant-cell span {
+  color: var(--muted);
+  font-size: clamp(12px, 1.1vw, 15px);
+  line-height: 1.4;
+}
+
+.orality-problem-panel {
+  display: grid;
+  align-content: center;
+  gap: clamp(8px, 1vw, 14px);
+  padding: clamp(20px, 2.2vw, 34px);
+  border-left: 7px solid var(--accent);
+  background: var(--paper-soft);
+}
+
+.orality-problem-panel span,
+.orality-tech-panel span {
+  color: var(--accent);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.orality-problem-panel h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(26px, 3.15vw, 48px);
+  font-weight: 520;
+  line-height: 1.08;
+}
+
+.orality-problem-panel p {
+  max-width: 1240px;
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(14px, 1.25vw, 18px);
+  line-height: 1.42;
+}
+
+.orality-tech-panel {
+  display: grid;
+  align-content: start;
+  gap: clamp(10px, 1.15vw, 16px);
+}
+
+.orality-tech-list {
+  display: grid;
+  align-content: start;
+  gap: clamp(9px, 1.05vw, 14px);
+  max-width: 1320px;
+  margin: 0;
+  padding: 0 0 0 30px;
+  list-style: disc;
+}
+
+.orality-tech-list li {
+  padding-left: 8px;
+  color: var(--ink);
+  font-size: clamp(18px, 1.75vw, 27px);
+  line-height: 1.24;
+}
+
+.orality-tech-list li::marker {
+  color: var(--accent);
+}
+
+.orality-takeaways .orality-point-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.orality-takeaways[data-slide-id="critical-read"] .orality-point-card {
+  gap: clamp(10px, 1.05vw, 16px);
+  padding: clamp(18px, 1.7vw, 28px);
+}
+
+.orality-takeaways[data-slide-id="critical-read"] .orality-point-card span {
+  font-size: clamp(12px, 0.85vw, 16px);
+}
+
+.orality-takeaways[data-slide-id="critical-read"] .orality-point-card strong {
+  font-size: clamp(22px, 2vw, 34px);
+  line-height: 1.08;
+}
+
+.orality-takeaways[data-slide-id="critical-read"] .orality-point-card p {
+  font-size: clamp(16px, 1.45vw, 24px);
+  line-height: 1.32;
+}
+
+.orality-related-slide {
+  gap: 14px;
+}
+
+.related-paper-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  min-height: 0;
+}
+
+.related-paper-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  min-height: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 250, 0.86);
+}
+
+.related-figure-shell {
+  min-height: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.related-paper-copy {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
 .move-card {
   grid-template-columns: 18px minmax(0, 1fr);
 }
@@ -907,6 +1675,11 @@ button {
   border-bottom: 1px solid var(--line);
 }
 
+.notes-header div {
+  display: grid;
+  gap: 2px;
+}
+
 .speaker-notes section {
   display: grid;
   gap: 9px;
@@ -942,9 +1715,10 @@ button {
 
 .presenter-notes-page {
   display: grid;
-  gap: 22px;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(22px, 3vw, 38px);
   min-height: 100vh;
-  padding: clamp(24px, 4vw, 44px);
+  padding: clamp(24px, 3.2vw, 56px);
   background:
     linear-gradient(90deg, rgba(31, 111, 87, 0.06) 1px, transparent 1px),
     linear-gradient(rgba(36, 89, 166, 0.05) 1px, transparent 1px),
@@ -970,7 +1744,7 @@ button {
 }
 
 .presenter-notes-hero h1 {
-  max-width: 980px;
+  max-width: min(100%, 1380px);
   margin: 0;
   color: var(--ink);
   font-size: clamp(42px, 7vw, 86px);
@@ -978,7 +1752,7 @@ button {
 }
 
 .presenter-notes-hero p {
-  max-width: 900px;
+  max-width: min(100%, 1120px);
   margin: 0;
   color: var(--muted);
   font-size: clamp(20px, 2.5vw, 30px);
@@ -988,7 +1762,7 @@ button {
 .presenter-notes-card {
   display: grid;
   gap: 14px;
-  max-width: 1120px;
+  width: 100%;
   padding: clamp(18px, 3vw, 30px);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1015,9 +1789,120 @@ button {
   padding-left: 26px;
 }
 
+@media (min-width: 1400px) {
+  .presenter-notes-page {
+    gap: clamp(24px, 2.4vw, 42px);
+  }
+
+  .presenter-notes-card {
+    align-self: stretch;
+    align-content: start;
+    padding: clamp(26px, 3vw, 48px);
+  }
+
+  .presenter-notes-card ul {
+    row-gap: clamp(22px, 2.2vw, 36px);
+    padding-left: 30px;
+  }
+
+  .presenter-notes-card li {
+    max-width: none;
+    font-size: clamp(25px, 1.65vw, 32px);
+    line-height: 1.32;
+  }
+}
+
 .presenter-notes-principles p {
   color: var(--muted);
   font-size: clamp(17px, 2vw, 22px);
+}
+
+.orality-cards-slide[data-slide-id="evaluation-task"] .orality-point-card {
+  gap: clamp(10px, 1.1vw, 16px);
+  padding: clamp(18px, 1.7vw, 26px);
+}
+
+.orality-cards-slide[data-slide-id="evaluation-task"] .orality-point-card p,
+.orality-cards-slide[data-slide-id="evaluation-task"] .orality-point-card li {
+  font-size: clamp(16px, 1.35vw, 23px);
+  line-height: 1.34;
+}
+
+.orality-cards-slide[data-slide-id="evaluation-task"] .orality-point-card ul {
+  gap: clamp(6px, 0.65vw, 10px);
+}
+
+.orality-big-idea[data-slide-id="transcript-trap"] .orality-quote-panel p,
+.orality-comparison[data-slide-id="problem-position"] .orality-copy-panel > p,
+.orality-figure-focus[data-slide-id="conceptual-framework"]
+  .orality-copy-panel
+  > p {
+  font-size: clamp(17px, 1.45vw, 23px);
+  line-height: 1.36;
+}
+
+.orality-cover[data-slide-id="paper-card"] .orality-point-card p,
+.orality-cover[data-slide-id="paper-card"] .orality-point-card a,
+.orality-cover[data-slide-id="paper-card"] .orality-point-card li,
+.orality-funnel-slide[data-slide-id="background-funnel"] .orality-funnel-step p,
+.orality-big-idea[data-slide-id="transcript-trap"] .orality-point-card p,
+.orality-big-idea[data-slide-id="transcript-trap"] .orality-point-card li,
+.orality-cards-slide[data-slide-id="author-contributions"]
+  .orality-point-card
+  p,
+.orality-cards-slide[data-slide-id="author-contributions"]
+  .orality-point-card
+  li,
+.orality-cards-slide[data-slide-id="formative-design-goals"]
+  .orality-point-card
+  p,
+.orality-cards-slide[data-slide-id="formative-design-goals"]
+  .orality-point-card
+  li,
+.orality-figure-focus[data-slide-id="system-overview"] .orality-point-card p,
+.orality-figure-focus[data-slide-id="system-overview"] .orality-point-card li,
+.orality-figure-focus[data-slide-id="conceptual-framework"]
+  .orality-point-card
+  p,
+.orality-figure-focus[data-slide-id="conceptual-framework"]
+  .orality-point-card
+  li,
+.orality-figure-focus[data-slide-id="voice-restructuring"]
+  .orality-point-card
+  p,
+.orality-figure-focus[data-slide-id="voice-restructuring"]
+  .orality-point-card
+  li,
+.orality-figure-focus[data-slide-id="embedded-scaffolds"] .orality-point-card p,
+.orality-figure-focus[data-slide-id="embedded-scaffolds"]
+  .orality-point-card
+  li,
+.orality-pipeline-slide[data-slide-id="implementation"] .orality-point-card p,
+.orality-pipeline-slide[data-slide-id="implementation"] .orality-point-card li,
+.orality-comparison[data-slide-id="problem-position"] .orality-point-card p,
+.orality-comparison[data-slide-id="problem-position"] .orality-point-card li,
+.orality-figure-focus[data-slide-id="workflow-strategies"]
+  .orality-point-card
+  p,
+.orality-figure-focus[data-slide-id="workflow-strategies"]
+  .orality-point-card
+  li,
+.orality-figure-focus[data-slide-id="related-orca"] .orality-point-card p,
+.orality-figure-focus[data-slide-id="related-orca"] .orality-point-card li,
+.orality-figure-focus[data-slide-id="related-ai-personality"]
+  .orality-point-card
+  p,
+.orality-figure-focus[data-slide-id="related-ai-personality"]
+  .orality-point-card
+  li,
+.orality-figure-focus[data-slide-id="related-visual-metaphors"]
+  .orality-point-card
+  p,
+.orality-figure-focus[data-slide-id="related-visual-metaphors"]
+  .orality-point-card
+  li {
+  font-size: clamp(15px, 1.3vw, 21px);
+  line-height: 1.35;
 }
 
 @media (max-width: 1520px) {
@@ -1120,7 +2005,13 @@ button {
   .architecture-layout,
   .interaction-layout,
   .discussion-layout,
-  .take-home-layout {
+  .take-home-layout,
+  .orality-cover,
+  .orality-comparison,
+  .orality-figure-focus,
+  .orality-pipeline-slide,
+  .orality-evidence-slide,
+  .orality-quadrant-slide {
     grid-template-columns: 1fr;
   }
 
@@ -1132,7 +2023,13 @@ button {
   .paired-lanes,
   .opportunity-map,
   .move-library,
-  .launchpad {
+  .launchpad,
+  .orality-meta-grid,
+  .orality-point-grid,
+  .orality-takeaways .orality-point-grid,
+  .related-paper-grid,
+  .orality-quadrant,
+  .orality-evidence-summary {
     grid-template-columns: 1fr;
   }
 

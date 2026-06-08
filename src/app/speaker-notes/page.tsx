@@ -15,7 +15,7 @@ const defaultNotes: PresenterNotesState = {
   total: slideTemplates.length,
   section: firstSlide.section,
   title: firstSlide.title,
-  subtitle: firstSlide.subtitle,
+  subtitle: firstSlide.subtitle ?? "",
   presenterMove: firstSlide.presenterMove,
   slots: firstSlide.slots,
   notes: firstSlide.notes,
@@ -62,37 +62,16 @@ export default function SpeakerNotesPage() {
           {notes.section}
         </span>
         <h1>{notes.title}</h1>
-        <p>{notes.subtitle}</p>
+        {notes.subtitle ? <p>{notes.subtitle}</p> : null}
       </header>
 
-      <section className="presenter-notes-card presenter-notes-move">
-        <span className="presenter-notes-label">Presenter move</span>
-        <p>{notes.presenterMove}</p>
-      </section>
-
       <section className="presenter-notes-card">
-        <span className="presenter-notes-label">Template slots</span>
-        <ul>
-          {notes.slots.map((slot) => (
-            <li key={slot}>{slot}</li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="presenter-notes-card">
-        <span className="presenter-notes-label">Quality checks</span>
+        <span className="presenter-notes-label">Key points</span>
         <ul>
           {notes.notes.map((note) => (
             <li key={note}>{note}</li>
           ))}
         </ul>
-      </section>
-
-      <section className="presenter-notes-card presenter-notes-principles">
-        <span className="presenter-notes-label">Deck principles</span>
-        {notes.principles.map((principle) => (
-          <p key={principle}>{principle}</p>
-        ))}
       </section>
     </main>
   );

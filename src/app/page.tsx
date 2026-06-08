@@ -3,17 +3,23 @@
 import {
   ArrowLeft,
   ArrowRight,
-  Check,
-  ChevronRight,
   Expand,
-  Eye,
-  GalleryVerticalEnd,
   NotebookTabs,
   PanelRightClose,
   PanelRightOpen,
 } from "lucide-react";
-import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import {
+  type CSSProperties,
+  type RefObject,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  type SlideFigure,
+  type SlidePoint,
   type SlideTemplate,
   sectionOrder,
   slideTemplates,
@@ -27,7 +33,7 @@ import {
 
 export default function Home() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [notesOpen, setNotesOpen] = useState(true);
+  const [notesOpen, setNotesOpen] = useState(false);
   const activeSlide = slideTemplates[activeIndex];
   const notesWindowRef = useRef<Window | null>(null);
   const notesChannelRef = useRef<BroadcastChannel | null>(null);
@@ -135,7 +141,7 @@ export default function Home() {
 
             return (
               <button
-                aria-label={`${String(index + 1).padStart(2, "0")} ${slide.title} ${slide.section}`}
+                aria-label={`${String(index + 1).padStart(2, "0")} ${slide.shortTitle ?? slide.title} ${slide.section}`}
                 className="slide-tab"
                 data-active={isActive}
                 key={slide.id}
@@ -147,7 +153,7 @@ export default function Home() {
                 </span>
                 <Icon size={16} aria-hidden="true" />
                 <span className="slide-tab-copy">
-                  <span>{slide.title}</span>
+                  <span>{slide.shortTitle ?? slide.title}</span>
                   <small>{slide.section}</small>
                 </span>
               </button>
@@ -158,6 +164,18 @@ export default function Home() {
 
       <section className="deck-stage" aria-label="Active slide">
         <header className="deck-toolbar">
+          <nav className="section-rail" aria-label="Deck sections">
+            {sectionOrder.map((section, index) => (
+              <span
+                data-active={section === activeSlide.section}
+                data-passed={index < currentSectionPosition}
+                key={section}
+              >
+                {section}
+              </span>
+            ))}
+          </nav>
+
           <div className="toolbar-actions">
             <button
               aria-label={
@@ -196,19 +214,10 @@ export default function Home() {
           </div>
         </header>
 
-        <nav className="section-rail" aria-label="Deck sections">
-          {sectionOrder.map((section, index) => (
-            <span
-              data-active={section === activeSlide.section}
-              data-passed={index < currentSectionPosition}
-              key={section}
-            >
-              {section}
-            </span>
-          ))}
-        </nav>
-
-        <article className={`slide-canvas tone-${activeSlide.tone}`}>
+        <article
+          className={`slide-canvas tone-${activeSlide.tone} layout-${activeSlide.layout}`}
+          data-slide-id={activeSlide.id}
+        >
           <SlideHeader slide={activeSlide} index={activeIndex} />
           <SlideBody slide={activeSlide} />
         </article>
@@ -227,7 +236,6 @@ export default function Home() {
               <ArrowLeft size={16} aria-hidden="true" />
               Previous
             </button>
-            <span className="keyboard-hint">Arrow keys, N/P, Home/End</span>
             <button
               className="nav-button primary"
               disabled={activeIndex === slideTemplates.length - 1}
@@ -271,7 +279,7 @@ function buildPresenterNotesState(
     total: slideTemplates.length,
     section: slide.section,
     title: slide.title,
-    subtitle: slide.subtitle,
+    subtitle: slide.subtitle ?? "",
     presenterMove: slide.presenterMove,
     slots: slide.slots,
     notes: slide.notes,
@@ -290,13 +298,28 @@ function SlideHeader({
     <header className="slide-header">
       <div className="slide-section">
         <span>{String(index + 1).padStart(2, "0")}</span>
-        <ChevronRight size={14} aria-hidden="true" />
-        <span>{slide.section}</span>
       </div>
       <div className="slide-title-row">
         <div>
           <h2>{slide.title}</h2>
-          <p>{slide.subtitle}</p>
+          {slide.subtitle ? <p>{slide.subtitle}</p> : null}
+          {slide.paperMeta ? (
+            <div className="slide-paper-badges">
+              <span className="paper-meta-badge">
+                <span>Venue</span>
+                <strong>{slide.paperMeta.venue}</strong>
+              </span>
+              <a
+                className="paper-meta-badge paper-meta-link"
+                href={slide.paperMeta.href}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <span>Paper Link</span>
+                <strong>ACM Digital Library</strong>
+              </a>
+            </div>
+          ) : null}
         </div>
       </div>
     </header>
@@ -304,125 +327,123 @@ function SlideHeader({
 }
 
 function SlideBody({ slide }: { slide: SlideTemplate }) {
-  if (slide.id === "paper-card") {
-    return <PaperCardSlide slide={slide} />;
+  if (slide.layout === "cover") {
+    return <CoverSlide slide={slide} />;
   }
 
-  if (slide.id === "why-this-paper") {
-    return <WhySlide slide={slide} />;
+  if (slide.layout === "big-idea") {
+    return <BigIdeaSlide slide={slide} />;
   }
 
-  if (slide.id === "background-funnel") {
+  if (slide.layout === "cards") {
+    return <CardsSlide slide={slide} />;
+  }
+
+  if (slide.layout === "funnel") {
     return <FunnelSlide slide={slide} />;
   }
 
-  if (slide.id === "problem-position") {
-    return <ProblemPositionSlide slide={slide} />;
+  if (slide.layout === "comparison") {
+    return <ComparisonSlide slide={slide} />;
   }
 
-  if (slide.id === "novelty-quadrant") {
+  if (slide.layout === "quadrant") {
     return <QuadrantSlide slide={slide} />;
   }
 
-  if (slide.id === "author-contributions") {
-    return <ContributionLedgerSlide slide={slide} authorView />;
+  if (slide.layout === "figure-focus") {
+    return <FigureFocusSlide slide={slide} />;
   }
 
-  if (slide.id === "presenter-contributions") {
-    return <ContributionLedgerSlide slide={slide} />;
+  if (slide.layout === "pipeline") {
+    return <PipelineSlide slide={slide} />;
   }
 
-  if (slide.id === "related-work") {
-    return <RelatedWorkSlide slide={slide} />;
+  if (slide.layout === "evidence") {
+    return <EvidenceSlide slide={slide} />;
   }
 
-  if (slide.id === "methods") {
-    return <MethodSlide slide={slide} />;
+  if (slide.layout === "related") {
+    return <RelatedSlide slide={slide} />;
   }
 
-  if (slide.id === "results-evaluation") {
-    return <EvaluationSlide slide={slide} />;
-  }
-
-  if (slide.id === "critical-thinking") {
-    return <CriticalSlide slide={slide} />;
-  }
-
-  if (slide.id === "take-home") {
-    return <TakeHomeSlide slide={slide} />;
-  }
-
-  if (slide.id === "talk-architecture") {
-    return <TalkArchitectureSlide slide={slide} />;
-  }
-
-  if (slide.id === "interaction-tricks") {
-    return <InteractionSlide slide={slide} />;
-  }
-
-  return <DiscussionSlide slide={slide} />;
+  return <TakeawaysSlide slide={slide} />;
 }
 
-function PaperCardSlide({ slide }: { slide: SlideTemplate }) {
+function CoverSlide({ slide }: { slide: SlideTemplate }) {
   return (
-    <div className="slide-grid title-layout">
-      <div className="paper-card-main">
-        <span className="field-label">Paper title</span>
-        <div className="paper-title-placeholder">
-          Replace with the exact paper title
-        </div>
-        <div className="paper-meta-grid">
-          {slide.slots.slice(1, 4).map((slot) => (
-            <div key={slot}>
-              <span>{slot}</span>
-              <strong>Fill in</strong>
-            </div>
-          ))}
-        </div>
-        <p>{slide.question}</p>
+    <div className="orality-layout orality-cover" data-slide-id={slide.id}>
+      <section className="orality-cover-headline">
+        <h3>{slide.headline}</h3>
+        {slide.presenterLine ? <p>{slide.presenterLine}</p> : null}
+      </section>
+      <div className="orality-meta-grid">
+        {slide.meta?.map((point) => (
+          <PointCard key={point.title} point={point} compact />
+        ))}
       </div>
-      <div className="figure-frame">
-        <div className="figure-ruler">
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="figure-placeholder">
-          <Eye size={34} aria-hidden="true" />
-          <strong>Primary figure or result crop</strong>
-          <span>{slide.visualCue}</span>
-        </div>
-      </div>
+      <FigurePanel figure={slide.figures?.[0]} priority />
     </div>
   );
 }
 
-function WhySlide({ slide }: { slide: SlideTemplate }) {
+function BigIdeaSlide({ slide }: { slide: SlideTemplate }) {
   return (
-    <div className="slide-grid evidence-layout">
-      <PromptPanel slide={slide} />
-      <div className="evidence-stack">
-        {slide.slots.map((slot, index) => (
-          <div className="evidence-card" key={slot}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <strong>{slot}</strong>
-            <p>{evidenceCopy[index]}</p>
-          </div>
-        ))}
-      </div>
+    <div className="orality-layout orality-big-idea" data-slide-id={slide.id}>
+      <section className="orality-quote-panel">
+        <h3>{slide.headline}</h3>
+        <p>{slide.body}</p>
+      </section>
+      <PointGrid points={slide.points} />
+    </div>
+  );
+}
+
+function CardsSlide({ slide }: { slide: SlideTemplate }) {
+  const hasBullets = Boolean(slide.bullets?.length);
+
+  return (
+    <div
+      className={`orality-layout orality-cards-slide${hasBullets ? " orality-bullet-slide" : ""}`}
+      data-slide-id={slide.id}
+    >
+      {hasBullets ? (
+        <>
+          <ul className="orality-motivation-bullets">
+            {slide.bullets?.map((bullet) => (
+              <li key={bullet}>{bullet}</li>
+            ))}
+          </ul>
+          <FigurePanel figure={slide.figures?.[0]} fitToFrame priority />
+        </>
+      ) : (
+        <>
+          <section className="orality-thesis">
+            <h3>{slide.headline}</h3>
+          </section>
+          <PointGrid points={slide.points} />
+        </>
+      )}
     </div>
   );
 }
 
 function FunnelSlide({ slide }: { slide: SlideTemplate }) {
   return (
-    <div className="slide-grid funnel-layout">
-      <PromptPanel slide={slide} />
-      <div className="funnel">
-        {slide.slots.map((slot, index) => (
-          <div className="funnel-step" data-step={index} key={slot}>
-            <span>{slot}</span>
-            <p>{funnelCopy[index]}</p>
+    <div
+      className="orality-layout orality-funnel-slide"
+      data-slide-id={slide.id}
+    >
+      <div className="orality-funnel">
+        {slide.points?.map((point, index) => (
+          <div
+            className="orality-funnel-step"
+            key={point.title}
+            style={{ "--step": index } as CSSProperties}
+          >
+            <span>{point.label}</span>
+            <strong>{point.title}</strong>
+            <p>{point.body}</p>
           </div>
         ))}
       </div>
@@ -430,248 +451,281 @@ function FunnelSlide({ slide }: { slide: SlideTemplate }) {
   );
 }
 
-function ProblemPositionSlide({ slide }: { slide: SlideTemplate }) {
+function ComparisonSlide({ slide }: { slide: SlideTemplate }) {
   return (
-    <div className="slide-grid position-layout">
-      <PromptPanel slide={slide} />
-      <div className="paired-lanes">
-        <ArgumentLane
-          title="New problem"
-          points={["Why now?", "What changed?", "Who is newly affected?"]}
-        />
-        <ArgumentLane
-          title="Old problem"
-          points={[
-            "Strongest current answer",
-            "Where it breaks",
-            "Why the gap remains",
-          ]}
-        />
-      </div>
+    <div className="orality-layout orality-comparison" data-slide-id={slide.id}>
+      <section className="orality-copy-panel">
+        <h3>{slide.headline}</h3>
+        <p>{slide.body}</p>
+        <PointGrid points={slide.points} compact />
+      </section>
+      <FigurePanel figure={slide.figures?.[0]} priority />
     </div>
   );
 }
 
 function QuadrantSlide({ slide }: { slide: SlideTemplate }) {
   return (
-    <div className="slide-grid quadrant-layout">
-      <div className="quadrant">
-        {slide.slots.map((slot, index) => (
-          <div className="quadrant-cell" data-selected={index === 0} key={slot}>
-            <strong>{slot}</strong>
-            <span>
-              {index === 0
-                ? "Mark selected cell"
-                : "Alternative classification"}
-            </span>
-          </div>
-        ))}
-      </div>
-      <PromptPanel slide={slide} compact />
+    <div className="orality-layout orality-quadrant-slide">
+      <section className="orality-problem-panel">
+        <span>New problem</span>
+        <h3>{slide.headline}</h3>
+        <p>{slide.body}</p>
+      </section>
+      <section className="orality-tech-panel">
+        <span>Existing techniques used</span>
+        <ul className="orality-tech-list">
+          {slide.bullets?.map((bullet) => (
+            <li key={bullet}>{bullet}</li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
 
-function ContributionLedgerSlide({
-  slide,
-  authorView = false,
-}: {
-  slide: SlideTemplate;
-  authorView?: boolean;
-}) {
-  const rows = authorView ? authorContributionRows : presenterContributionRows;
+function FigureFocusSlide({ slide }: { slide: SlideTemplate }) {
+  const figureOnRight = [
+    "system-overview",
+    "conceptual-framework",
+    "voice-restructuring",
+    "embedded-scaffolds",
+    "workflow-strategies",
+    "related-orca",
+    "related-ai-personality",
+    "related-visual-metaphors",
+  ].includes(slide.id);
+  const copyPanel = (
+    <section className="orality-copy-panel">
+      {slide.headline ? <h3>{slide.headline}</h3> : null}
+      {slide.body ? <p>{slide.body}</p> : null}
+      {slide.points?.length ? (
+        <PointGrid points={slide.points} compact />
+      ) : null}
+    </section>
+  );
+  const figurePanel = <FigurePanel figure={slide.figures?.[0]} priority />;
 
   return (
-    <div className="ledger-layout">
-      <PromptPanel slide={slide} compact />
-      <div className="ledger">
-        <div className="ledger-row ledger-head">
-          <span>Claim</span>
-          <span>Evidence</span>
-          <span>Reading</span>
-        </div>
-        {rows.map((row) => (
-          <div className="ledger-row" key={row.claim}>
-            <strong>{row.claim}</strong>
-            <span>{row.evidence}</span>
-            <span>{row.reading}</span>
-          </div>
-        ))}
-      </div>
+    <div
+      className={`orality-layout orality-figure-focus${figureOnRight ? " figure-right" : ""}`}
+      data-slide-id={slide.id}
+    >
+      {figureOnRight ? (
+        <>
+          {copyPanel}
+          {figurePanel}
+        </>
+      ) : (
+        <>
+          {figurePanel}
+          {copyPanel}
+        </>
+      )}
     </div>
   );
 }
 
-function RelatedWorkSlide({ slide }: { slide: SlideTemplate }) {
+function PipelineSlide({ slide }: { slide: SlideTemplate }) {
+  const copyStyle =
+    slide.id === "implementation"
+      ? ({ alignContent: "center" } as CSSProperties)
+      : undefined;
+
   return (
-    <div className="related-layout">
-      <PromptPanel slide={slide} compact />
-      <div className="critique-table">
-        <div className="critique-row critique-head">
-          <span>Work</span>
-          <span>Role</span>
-          <span>Weakness</span>
-          <span>Paper response</span>
-        </div>
-        {relatedRows.map((row) => (
-          <div className="critique-row" key={`${row.role}-${row.response}`}>
-            <strong>{row.work}</strong>
-            <span>{row.role}</span>
-            <span>{row.weakness}</span>
-            <span>{row.response}</span>
-          </div>
-        ))}
-      </div>
+    <div
+      className="orality-layout orality-pipeline-slide"
+      data-slide-id={slide.id}
+    >
+      <section className="orality-copy-panel" style={copyStyle}>
+        {slide.headline ? <h3>{slide.headline}</h3> : null}
+        <PointGrid points={slide.points} compact />
+      </section>
+      <FigurePanel figure={slide.figures?.[0]} priority />
     </div>
   );
 }
 
-function MethodSlide({ slide }: { slide: SlideTemplate }) {
+function EvidenceSlide({ slide }: { slide: SlideTemplate }) {
   return (
-    <div className="method-layout">
-      <PromptPanel slide={slide} compact />
-      <div className="method-flow">
-        {methodCards.map((card) => (
-          <div className="method-card" key={card.title}>
-            <span>{card.step}</span>
-            <strong>{card.title}</strong>
-            <p>{card.copy}</p>
-          </div>
-        ))}
-      </div>
+    <div className="orality-layout orality-evidence-slide">
+      <section className="orality-evidence-summary">
+        <h3>{slide.headline}</h3>
+        <PointGrid points={slide.points} compact />
+      </section>
+      <FigurePanel figure={slide.figures?.[0]} fitToFrame priority />
     </div>
   );
 }
 
-function EvaluationSlide({ slide }: { slide: SlideTemplate }) {
+function TakeawaysSlide({ slide }: { slide: SlideTemplate }) {
   return (
-    <div className="evaluation-layout">
-      <PromptPanel slide={slide} compact />
-      <div className="scoreboard">
-        {evaluationRows.map((row) => (
-          <div className="score-card" key={row.label}>
-            <span>{row.label}</span>
-            <strong>{row.value}</strong>
-            <p>{row.copy}</p>
-          </div>
-        ))}
-      </div>
+    <div className="orality-layout orality-takeaways" data-slide-id={slide.id}>
+      <section className="orality-thesis">
+        <h3>{slide.headline}</h3>
+      </section>
+      <PointGrid points={slide.points} />
     </div>
   );
 }
 
-function CriticalSlide({ slide }: { slide: SlideTemplate }) {
+function RelatedSlide({ slide }: { slide: SlideTemplate }) {
   return (
-    <div className="critical-layout">
-      <PromptPanel slide={slide} compact />
-      <div className="opportunity-map">
-        {slide.slots.map((slot, index) => (
-          <div className="opportunity-node" key={slot}>
-            <span>{slot}</span>
-            <p>{criticalCopy[index]}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+    <div className="orality-layout orality-related-slide">
+      <section className="orality-thesis">
+        <h3>{slide.headline}</h3>
+      </section>
+      <div className="related-paper-grid">
+        {slide.points?.map((point, index) => {
+          const figure = slide.figures?.[index];
+          const figureStyle = figure
+            ? ({
+                "--figure-aspect": `${figure.width} / ${figure.height}`,
+              } as CSSProperties)
+            : undefined;
 
-function TakeHomeSlide({ slide }: { slide: SlideTemplate }) {
-  return (
-    <div className="take-home-layout">
-      {slide.slots.map((slot, index) => (
-        <div className="takeaway-card" key={slot}>
-          <span>{String(index + 1).padStart(2, "0")}</span>
-          <strong>{slot}</strong>
-          <p>{takeawayCopy[index]}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function TalkArchitectureSlide({ slide }: { slide: SlideTemplate }) {
-  return (
-    <div className="architecture-layout">
-      <PromptPanel slide={slide} compact />
-      <div className="arc">
-        {slide.slots.map((slot, index) => (
-          <div className="arc-step" key={slot}>
-            <span>{slot}</span>
-            <strong>{arcCopy[index]}</strong>
-          </div>
-        ))}
+          return (
+            <article
+              className="related-paper-card"
+              key={point.title}
+              style={figureStyle}
+            >
+              {figure ? (
+                <div className="related-figure-shell">
+                  <Image
+                    alt={figure.alt}
+                    height={figure.height}
+                    sizes="(max-width: 820px) 90vw, 24vw"
+                    src={figure.src}
+                    width={figure.width}
+                  />
+                </div>
+              ) : null}
+              <div className="related-paper-copy">
+                <span>{point.label}</span>
+                <strong>{point.title}</strong>
+                <p>{point.body}</p>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-function InteractionSlide({ slide }: { slide: SlideTemplate }) {
-  return (
-    <div className="interaction-layout">
-      <PromptPanel slide={slide} compact />
-      <div className="move-library">
-        {slide.slots.map((slot, index) => (
-          <div className="move-card" key={slot}>
-            <Check size={16} aria-hidden="true" />
-            <strong>{slot}</strong>
-            <p>{interactionCopy[index]}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function DiscussionSlide({ slide }: { slide: SlideTemplate }) {
-  return (
-    <div className="discussion-layout">
-      <PromptPanel slide={slide} compact />
-      <div className="launchpad">
-        {slide.slots.map((slot, index) => (
-          <div className="launch-card" key={slot}>
-            <span>{slot}</span>
-            <strong>{discussionCopy[index]}</strong>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function PromptPanel({
-  slide,
+function PointGrid({
+  points = [],
   compact = false,
 }: {
-  slide: SlideTemplate;
+  points?: SlidePoint[];
   compact?: boolean;
 }) {
   return (
-    <section className="prompt-panel" data-compact={compact}>
-      <span className="field-label">Core question</span>
-      <h3>{slide.question}</h3>
-      <div className="prompt-meta">
-        <div>
-          <strong>Artifact</strong>
-          <span>{slide.artifact}</span>
-        </div>
-        <div>
-          <strong>Visual cue</strong>
-          <span>{slide.visualCue}</span>
-        </div>
-      </div>
-    </section>
+    <div className="orality-point-grid" data-compact={compact}>
+      {points.map((point) => (
+        <PointCard compact={compact} key={point.title} point={point} />
+      ))}
+    </div>
   );
 }
 
-function ArgumentLane({ title, points }: { title: string; points: string[] }) {
+function PointCard({
+  point,
+  compact = false,
+}: {
+  point: SlidePoint;
+  compact?: boolean;
+}) {
   return (
-    <div className="argument-lane">
-      <strong>{title}</strong>
-      {points.map((point) => (
-        <span key={point}>{point}</span>
-      ))}
-    </div>
+    <article
+      className="orality-point-card"
+      data-compact={compact}
+      data-emphasis={point.emphasis}
+    >
+      <div>
+        {point.label ? <span>{point.label}</span> : null}
+        <strong>{point.title}</strong>
+      </div>
+      {point.href ? (
+        <a href={point.href} rel="noreferrer" target="_blank">
+          {point.body}
+        </a>
+      ) : point.bullets?.length ? (
+        <>
+          {point.showBodyWithBullets ? <p>{point.body}</p> : null}
+          <ul>
+            {point.bullets.map((bullet) => (
+              <li key={bullet}>{bullet}</li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p>{point.body}</p>
+      )}
+    </article>
+  );
+}
+
+function FigurePanel({
+  figure,
+  fitToFrame = false,
+  priority = false,
+}: {
+  figure?: SlideFigure;
+  fitToFrame?: boolean;
+  priority?: boolean;
+}) {
+  if (!figure) {
+    return null;
+  }
+
+  const figureStyle = {
+    "--figure-aspect": `${figure.width} / ${figure.height}`,
+    "--figure-height": figure.height,
+    "--figure-width": figure.width,
+  } as CSSProperties;
+  const imageStyle = fitToFrame
+    ? ({
+        height: "100%",
+        objectFit: "contain",
+        width: "100%",
+      } as CSSProperties)
+    : undefined;
+
+  return (
+    <figure className="orality-figure-panel" style={figureStyle}>
+      <div className="paper-figure-shell">
+        <Image
+          alt={figure.alt}
+          height={figure.height}
+          priority={priority}
+          sizes={
+            fitToFrame
+              ? "(max-width: 820px) 90vw, 78vw"
+              : "(max-width: 820px) 90vw, 45vw"
+          }
+          src={figure.src}
+          style={imageStyle}
+          width={figure.width}
+        />
+      </div>
+      <figcaption>
+        <span>{figure.caption}</span>
+      </figcaption>
+      {figure.read ? (
+        <aside className="figure-read-card">
+          <span>My read</span>
+          <strong>{figure.read}</strong>
+        </aside>
+      ) : null}
+      {figure.idea ? (
+        <aside className="figure-read-card">
+          <span>My idea</span>
+          <strong>{figure.idea}</strong>
+        </aside>
+      ) : null}
+    </figure>
   );
 }
 
@@ -686,197 +740,13 @@ function SpeakerNotes({ slide }: { slide: SlideTemplate }) {
         </div>
       </div>
       <section>
-        <span className="field-label">Presenter move</span>
-        <p>{slide.presenterMove}</p>
-      </section>
-      <section>
-        <span className="field-label">Template slots</span>
-        <ul>
-          {slide.slots.map((slot) => (
-            <li key={slot}>{slot}</li>
-          ))}
-        </ul>
-      </section>
-      <section>
-        <span className="field-label">Quality checks</span>
+        <span className="field-label">Key points</span>
         <ul>
           {slide.notes.map((note) => (
             <li key={note}>{note}</li>
           ))}
         </ul>
       </section>
-      <section className="principles">
-        <div>
-          <GalleryVerticalEnd size={18} aria-hidden="true" />
-          <strong>Deck principles</strong>
-        </div>
-        {templatePrinciples.map((principle) => (
-          <p key={principle}>{principle}</p>
-        ))}
-      </section>
     </aside>
   );
 }
-
-const evidenceCopy = [
-  "Show the signal that made you notice the paper.",
-  "Connect the paper to the group's current questions.",
-  "Name the method, figure, dataset, or critique worth reusing.",
-  "State what the room should challenge during the talk.",
-];
-
-const funnelCopy = [
-  "What field context must the audience know?",
-  "What pain point or opportunity makes the work necessary?",
-  "What exact problem does the paper address?",
-  "What is outside the scope of the paper?",
-];
-
-const authorContributionRows = [
-  {
-    claim: "Author claim 1",
-    evidence: "Paper section, figure, theorem, or study",
-    reading: "Method, system, theory, data, or finding",
-  },
-  {
-    claim: "Author claim 2",
-    evidence: "Exact artifact supporting the claim",
-    reading: "Dependency or assumption",
-  },
-  {
-    claim: "Author claim 3",
-    evidence: "Evaluation or demonstration",
-    reading: "Strength of evidence",
-  },
-];
-
-const presenterContributionRows = [
-  {
-    claim: "I accept",
-    evidence: "What convinced me",
-    reading: "Keep this claim",
-  },
-  {
-    claim: "I qualify",
-    evidence: "Where the claim is narrower",
-    reading: "Use with care",
-  },
-  {
-    claim: "I contest",
-    evidence: "Missing evidence or weak assumption",
-    reading: "Open discussion",
-  },
-  {
-    claim: "I transfer",
-    evidence: "Reusable method or framing",
-    reading: "Group opportunity",
-  },
-];
-
-const relatedRows = [
-  {
-    work: "Author, Year, Venue",
-    role: "Compared against",
-    weakness: "What it cannot do",
-    response: "How this paper improves",
-  },
-  {
-    work: "Author, Year, Venue",
-    role: "Built on",
-    weakness: "What had to be adapted",
-    response: "Borrowed algorithm or representation",
-  },
-  {
-    work: "Author, Year, Venue",
-    role: "Evaluation baseline",
-    weakness: "Metric or workflow gap",
-    response: "New comparison or task",
-  },
-];
-
-const methodCards = [
-  {
-    step: "01",
-    title: "Representation",
-    copy: "What is encoded, modeled, or transformed?",
-  },
-  {
-    step: "02",
-    title: "Task",
-    copy: "What analytical action does it support?",
-  },
-  {
-    step: "03",
-    title: "Cue",
-    copy: "What should the audience observe in the figure?",
-  },
-  {
-    step: "04",
-    title: "Interaction",
-    copy: "What does the user do to solve the task?",
-  },
-  {
-    step: "05",
-    title: "Rationale",
-    copy: "Why is this better than plausible alternatives?",
-  },
-];
-
-const evaluationRows = [
-  {
-    label: "Capability",
-    value: "New",
-    copy: "Show the result that was not previously achievable.",
-  },
-  {
-    label: "Comparison",
-    value: "Better",
-    copy: "Identify efficiency, intuitiveness, accuracy, or coverage gains.",
-  },
-  {
-    label: "Evidence",
-    value: "Tested",
-    copy: "Name the case study, metric, user study, ablation, or proof.",
-  },
-  {
-    label: "Limit",
-    value: "Bounded",
-    copy: "State what the evaluation does not establish.",
-  },
-];
-
-const criticalCopy = [
-  "A precise weakness in method, evidence, scope, or assumptions.",
-  "What could go wrong if the idea is reused uncritically.",
-  "A principle or heuristic you learned from the paper.",
-  "A concrete way this could help a current group project.",
-];
-
-const takeawayCopy = [
-  "The problem or framing the audience should remember.",
-  "The method, figure, or technique worth borrowing.",
-  "The open question or limitation worth discussing.",
-];
-
-const arcCopy = [
-  "Start from a pain point",
-  "Make the answer non-obvious",
-  "Show the weaker path",
-  "Reveal the paper's path",
-  "Return to the original question",
-];
-
-const interactionCopy = [
-  "Use when the audience can predict before you reveal.",
-  "Use when a figure contains an insight they can discover.",
-  "Use when the advantage is clearest through contrast.",
-  "Use when the data has a visible mystery.",
-  "Use when an encoding needs visual, textual, and oral reinforcement.",
-];
-
-const discussionCopy = [
-  "What should we debate?",
-  "Where could this fit our work?",
-  "What failure should we test first?",
-  "What is the smallest follow-up experiment?",
-];
