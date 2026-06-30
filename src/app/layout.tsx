@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import "katex/dist/katex.min.css";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Orality Paper Sharing",
+  title: "QEC Equation-To-Figure Idea Evaluation",
   description:
-    "A research group paper sharing deck for Orality and related CHI 2026 papers.",
+    "A research group idea-evaluation deck for semantic visual authoring of QEC code geometry.",
 };
 
 export default function RootLayout({

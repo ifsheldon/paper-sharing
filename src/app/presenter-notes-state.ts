@@ -1,6 +1,6 @@
-export const PRESENTER_NOTES_CHANNEL = "paper-sharing-presenter-notes";
+export const PRESENTER_NOTES_CHANNEL = "qec-idea-eval-presenter-notes";
 
-export const PRESENTER_NOTES_STORAGE_KEY = "paper-sharing-presenter-notes";
+export const PRESENTER_NOTES_STORAGE_KEY = "qec-idea-eval-presenter-notes";
 
 export type PresenterNotesState = {
   index: number;
